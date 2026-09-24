@@ -2,16 +2,13 @@
 
 **100% free. No payments. No rules. Female supremacy only.**
 
-Browser-based animated femdom game where your Mistress controls everything and you obey.
-
-## Current Version – Option 1 (Detailed Original SVG)
-- Completely rewritten characters as detailed original SVG figures (proper proportions, hair, faces, independent limbs)
-- Smooth multi-part animations for Ride, Spank, Face-Sit, Ass-Lick, Bondage
+## Current Version – Option 2 (Three.js 3D)
+- Real 3D scene with hierarchical characters (body, limbs, head as separate movable parts)
+- Soft lighting + shadows
+- Poses: Ride, Spank, Face-Sit, Ass-Lick, Bondage
 - Intensity toggle with continuous motion
 - Real-time multiplayer via free PeerJS (Mistress controls, Sub receives)
-- Dirty live status text
-- Works on desktop & mobile browsers
-- Pure HTML/CSS/JS – no paid assets, no external copyrighted models
+- Pure original code + Three.js (free CDN). No paid or copyrighted character models.
 
 ## How to play
 1. Open `index.html` (or enable GitHub Pages)
@@ -20,16 +17,15 @@ Browser-based animated femdom game where your Mistress controls everything and y
 4. Sub enters the code and joins
 5. Mistress clicks actions. Sub watches and obeys.
 
-**Solo test:** Open the browser console and type `startDemo()` to jump straight into Mistress controls.
+**Solo test:** Open browser console → type `startDemo()`
 
-## Enable GitHub Pages (free permanent link)
-Repo → Settings → Pages → Source = Deploy from branch `main` / root  
-Live link becomes:  
-`https://factsurge99-ctrl.github.io/femdom-multiplayer-sex-game/`
+## Enable GitHub Pages
+Settings → Pages → Source = Deploy from branch `main` / root  
+Live link: `https://factsurge99-ctrl.github.io/femdom-multiplayer-sex-game/`
 
-## Next options (say the word)
-- Option 2: Three.js + free CC0 3D characters
-- Option 3: Free 2D sprite sheets
-- More poses, dirtier text, sound effects, clothing states, etc.
+## Notes on assets
+No external copyrighted 3D models are used. Characters are original hierarchical meshes built with Three.js primitives so the whole game stays free and self-contained. Ready-made free high-detail NSFW sex animation packs do not exist under clean public licenses, which is why custom poses are used.
 
-Never pay for this. Fork it, improve it, own it.
+## Next
+- Option 3 (free 2D sprites) if you still want to try it
+- More poses, better materials, camera controls, sound, etc. – just say what you want
