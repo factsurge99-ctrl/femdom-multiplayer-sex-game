@@ -3,18 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Femdom Multiplayer – She Owns You</title>
+<title>Femdom Multiplayer – She Owns You (3D)</title>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <style>
   :root {
     --pink: #ff4d6d;
-    --dark: #0d0408;
-    --mid: #1f0a14;
+    --dark: #0a0306;
+    --mid: #1a0a12;
     --light: #ffc2d1;
-    --skin-w: #f5c9b0;
-    --skin-m: #e0b08a;
-    --hair-w: #2c1810;
-    --hair-m: #1a1210;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -28,506 +25,505 @@
     padding: 10px;
   }
   h1 {
-    font-size: 1.5rem;
+    font-size: 1.45rem;
     text-align: center;
-    margin: 6px 0 10px;
-    text-shadow: 0 0 16px var(--pink);
-    letter-spacing: 0.6px;
+    margin: 4px 0 8px;
+    text-shadow: 0 0 14px var(--pink);
   }
-  #lobby, #game {
-    width: 100%;
-    max-width: 460px;
-  }
+  #lobby, #game { width: 100%; max-width: 480px; }
   .card {
     background: var(--mid);
     border: 2px solid var(--pink);
-    border-radius: 14px;
-    padding: 16px;
-    margin-bottom: 12px;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
   }
   button, input {
     width: 100%;
-    padding: 12px;
-    margin: 5px 0;
-    border-radius: 10px;
+    padding: 11px;
+    margin: 4px 0;
+    border-radius: 9px;
     border: none;
-    font-size: 0.98rem;
+    font-size: 0.95rem;
     font-weight: 600;
   }
   button {
-    background: linear-gradient(180deg, #ff5a7a, #d9184a);
+    background: linear-gradient(180deg, #ff5a7a, #d01840);
     color: #fff;
     cursor: pointer;
     transition: 0.15s;
-    box-shadow: 0 3px 10px #ff4d6d40;
   }
   button:hover { transform: scale(1.03); filter: brightness(1.08); }
   button:active { transform: scale(0.97); }
-  button:disabled { opacity: 0.4; cursor: not-allowed; }
   input {
-    background: #2e1220;
+    background: #2a1220;
     color: var(--light);
-    border: 1px solid #ff4d6d66;
+    border: 1px solid #ff4d6d55;
   }
   #stage {
     width: 100%;
-    height: 460px;
-    background: radial-gradient(ellipse at 50% 85%, #2a1020 0%, #0d0408 75%);
-    border-radius: 14px;
-    position: relative;
+    height: 420px;
+    border-radius: 12px;
     overflow: hidden;
     border: 2px solid var(--pink);
-    margin-bottom: 10px;
-    box-shadow: inset 0 0 50px #000a;
+    margin-bottom: 8px;
+    background: #0a0306;
   }
-
-  /* ===== SVG CHARACTERS ===== */
-  .char-svg {
-    position: absolute;
-    overflow: visible;
-    transition: all 0.7s cubic-bezier(0.34, 1.15, 0.64, 1);
-  }
-  #mistress-svg {
-    width: 200px;
-    height: 340px;
-    left: 130px;
-    bottom: 40px;
-    z-index: 5;
-  }
-  #sub-svg {
-    width: 160px;
-    height: 280px;
-    left: 155px;
-    bottom: 10px;
-    z-index: 3;
-  }
-
-  /* joint groups for animation */
-  .joint {
-    transition: transform 0.55s cubic-bezier(0.34, 1.15, 0.64, 1);
-    transform-origin: center top;
-  }
-
-  /* ===== POSES ===== */
-  .pose-ride #mistress-svg { left: 125px; bottom: 70px; }
-  .pose-ride #mistress-svg .leg-l { transform: rotate(22deg); }
-  .pose-ride #mistress-svg .leg-r { transform: rotate(-22deg); }
-  .pose-ride #mistress-svg .arm-l { transform: rotate(18deg); }
-  .pose-ride #mistress-svg .arm-r { transform: rotate(-18deg); }
-  .pose-ride #sub-svg { left: 155px; bottom: 5px; transform: scale(0.94); }
-  .pose-ride #sub-svg .arm-l { transform: rotate(12deg); }
-  .pose-ride #sub-svg .arm-r { transform: rotate(-12deg); }
-
-  .pose-spank #mistress-svg { left: 70px; bottom: 55px; transform: rotate(-6deg); }
-  .pose-spank #mistress-svg .arm-r { transform: rotate(-75deg); }
-  .pose-spank #mistress-svg .leg-l { transform: rotate(10deg); }
-  .pose-spank #sub-svg { left: 200px; bottom: 5px; transform: rotate(18deg) scale(0.92); }
-  .pose-spank #sub-svg .arm-l { transform: rotate(-35deg); }
-  .pose-spank #sub-svg .arm-r { transform: rotate(45deg); }
-
-  .pose-facesit #mistress-svg { left: 130px; bottom: 145px; }
-  .pose-facesit #mistress-svg .leg-l { transform: rotate(38deg); }
-  .pose-facesit #mistress-svg .leg-r { transform: rotate(-38deg); }
-  .pose-facesit #mistress-svg .hips { transform: scaleY(1.08); }
-  .pose-facesit #sub-svg { left: 150px; bottom: 0; transform: scale(0.86); }
-  .pose-facesit #sub-svg .head { transform: rotate(-10deg); }
-
-  .pose-asslick #mistress-svg { left: 55px; bottom: 60px; transform: rotate(-18deg); }
-  .pose-asslick #mistress-svg .arm-l { transform: rotate(35deg); }
-  .pose-asslick #mistress-svg .arm-r { transform: rotate(-12deg); }
-  .pose-asslick #sub-svg { left: 210px; bottom: 45px; transform: rotate(42deg) scale(0.9); }
-  .pose-asslick #sub-svg .head { transform: rotate(-22deg); }
-  .pose-asslick #sub-svg .arm-l { transform: rotate(55deg); }
-
-  .pose-bondage #mistress-svg { left: 140px; bottom: 75px; }
-  .pose-bondage #mistress-svg .arm-l,
-  .pose-bondage #mistress-svg .arm-r { transform: rotate(8deg); }
-  .pose-bondage #sub-svg { left: 145px; bottom: 5px; transform: scale(0.9); }
-  .pose-bondage #sub-svg .arm-l { transform: rotate(-95deg) translateY(8px); }
-  .pose-bondage #sub-svg .arm-r { transform: rotate(95deg) translateY(8px); }
-  .pose-bondage #sub-svg .leg-l { transform: rotate(20deg); }
-  .pose-bondage #sub-svg .leg-r { transform: rotate(-20deg); }
-
-  /* ===== INTENSE KEYFRAMES ===== */
-  .intense.pose-ride #mistress-svg {
-    animation: rideBounce 0.36s ease-in-out infinite alternate;
-  }
-  .intense.pose-spank #mistress-svg .arm-r {
-    animation: spankSwing 0.28s ease-in-out infinite alternate;
-  }
-  .intense.pose-facesit #mistress-svg {
-    animation: grind 0.42s ease-in-out infinite alternate;
-  }
-  .intense.pose-asslick #sub-svg .head {
-    animation: lickMove 0.34s ease-in-out infinite alternate;
-  }
-  .intense.pose-bondage #sub-svg {
-    animation: struggle 0.65s ease-in-out infinite alternate;
-  }
-
-  @keyframes rideBounce {
-    from { transform: translateY(0); }
-    to { transform: translateY(-22px); }
-  }
-  @keyframes spankSwing {
-    from { transform: rotate(-40deg); }
-    to { transform: rotate(-100deg); }
-  }
-  @keyframes grind {
-    from { transform: translateY(0) scale(1); }
-    to { transform: translateY(-14px) scale(1.05); }
-  }
-  @keyframes lickMove {
-    from { transform: rotate(-22deg) translateX(0); }
-    to { transform: rotate(-30deg) translateX(7px); }
-  }
-  @keyframes struggle {
-    from { transform: scale(0.9) rotate(-2.5deg); }
-    to { transform: scale(0.9) rotate(2.5deg); }
-  }
-
   #status {
     text-align: center;
-    font-size: 1.02rem;
-    min-height: 2.6em;
-    margin: 6px 0 10px;
-    line-height: 1.35;
-    padding: 0 4px;
+    font-size: 0.98rem;
+    min-height: 2.5em;
+    margin: 6px 0 8px;
+    line-height: 1.3;
   }
   .role-badge {
     display: inline-block;
-    background: linear-gradient(90deg, #ff4d6d, #c01840);
+    background: linear-gradient(90deg, #ff4d6d, #b01030);
     color: #fff;
-    padding: 4px 12px;
-    border-radius: 18px;
-    font-size: 0.82rem;
-    margin-bottom: 8px;
-    letter-spacing: 0.4px;
+    padding: 3px 11px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    margin-bottom: 6px;
   }
   .controls {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: 7px;
   }
-  .controls button { margin: 0; font-size: 0.88rem; padding: 11px 6px; }
-  #roomInfo { font-size: 0.88rem; opacity: 0.8; text-align: center; margin-top: 8px; }
+  .controls button { margin: 0; font-size: 0.85rem; padding: 10px 5px; }
+  #roomInfo { font-size: 0.85rem; opacity: 0.75; text-align: center; margin-top: 6px; }
   .hidden { display: none !important; }
-  .note { font-size: 0.7rem; opacity: 0.45; text-align: center; margin-top: 14px; }
+  .note { font-size: 0.68rem; opacity: 0.4; text-align: center; margin-top: 12px; }
 </style>
 </head>
 <body>
-  <h1>She Owns You</h1>
+  <h1>She Owns You · 3D</h1>
 
-  <!-- LOBBY -->
   <div id="lobby">
     <div class="card">
-      <p style="margin-bottom:10px;text-align:center;">Choose your role. Mistress controls everything.</p>
+      <p style="margin-bottom:8px;text-align:center;">Choose your role. Mistress controls everything.</p>
       <button id="btnMistress">I am the Mistress</button>
       <button id="btnSub">I am the Sub</button>
     </div>
-
     <div id="mistressSetup" class="card hidden">
-      <p>Create a room for your sub to join.</p>
+      <p>Create a room for your sub.</p>
       <button id="btnCreate">Create Room</button>
       <div id="roomCodeDisplay" class="hidden" style="margin-top:10px;text-align:center;">
         <p>Room Code:</p>
-        <p id="codeText" style="font-size:1.85rem;letter-spacing:4px;color:#fff;font-weight:700;"></p>
-        <p style="font-size:0.82rem;margin-top:5px;">Tell your sub this code</p>
+        <p id="codeText" style="font-size:1.8rem;letter-spacing:4px;color:#fff;font-weight:700;"></p>
       </div>
     </div>
-
     <div id="subSetup" class="card hidden">
-      <p>Enter the code your Mistress gave you.</p>
+      <p>Enter the code from your Mistress.</p>
       <input id="joinCode" placeholder="Room code" maxlength="6" style="text-transform:uppercase;">
       <button id="btnJoin">Join & Obey</button>
     </div>
   </div>
 
-  <!-- GAME -->
   <div id="game" class="hidden">
     <div class="role-badge" id="roleBadge"></div>
-    <div id="stage" class="pose-ride">
-
-      <!-- ========== MISTRESS SVG ========== -->
-      <svg id="mistress-svg" class="char-svg" viewBox="0 0 200 340" xmlns="http://www.w3.org/2000/svg">
-        <!-- legs -->
-        <g class="joint leg-l" transform="translate(68,200)">
-          <rect x="-11" y="0" width="22" height="95" rx="11" fill="url(#skinW)"/>
-          <ellipse cx="0" cy="98" rx="13" ry="8" fill="#e8b090"/>
-        </g>
-        <g class="joint leg-r" transform="translate(132,200)">
-          <rect x="-11" y="0" width="22" height="95" rx="11" fill="url(#skinW)"/>
-          <ellipse cx="0" cy="98" rx="13" ry="8" fill="#e8b090"/>
-        </g>
-
-        <!-- hips -->
-        <g class="hips">
-          <ellipse cx="100" cy="195" rx="48" ry="28" fill="url(#lingerie)"/>
-          <ellipse cx="100" cy="185" rx="42" ry="18" fill="#c01840" opacity="0.7"/>
-        </g>
-
-        <!-- torso + breasts -->
-        <g class="torso">
-          <path d="M70,95 Q100,85 130,95 L138,175 Q100,185 62,175 Z" fill="url(#lingerie)"/>
-          <ellipse cx="82" cy="125" rx="18" ry="16" fill="#ff8fb0"/>
-          <ellipse cx="118" cy="125" rx="18" ry="16" fill="#ff8fb0"/>
-          <circle cx="82" cy="128" r="4" fill="#e06080"/>
-          <circle cx="118" cy="128" r="4" fill="#e06080"/>
-        </g>
-
-        <!-- arms -->
-        <g class="joint arm-l" transform="translate(58,100)">
-          <rect x="-9" y="0" width="18" height="80" rx="9" fill="url(#skinW)"/>
-          <ellipse cx="0" cy="82" rx="10" ry="7" fill="#e8b090"/>
-        </g>
-        <g class="joint arm-r" transform="translate(142,100)">
-          <rect x="-9" y="0" width="18" height="80" rx="9" fill="url(#skinW)"/>
-          <ellipse cx="0" cy="82" rx="10" ry="7" fill="#e8b090"/>
-        </g>
-
-        <!-- neck -->
-        <rect x="90" y="72" width="20" height="22" rx="6" fill="var(--skin-w)"/>
-
-        <!-- head -->
-        <g class="head">
-          <ellipse cx="100" cy="48" rx="32" ry="36" fill="var(--skin-w)"/>
-          <!-- eyes -->
-          <ellipse cx="88" cy="45" rx="5" ry="6" fill="#fff"/>
-          <ellipse cx="112" cy="45" rx="5" ry="6" fill="#fff"/>
-          <circle cx="89" cy="46" r="3" fill="#3a2010"/>
-          <circle cx="113" cy="46" r="3" fill="#3a2010"/>
-          <!-- brows -->
-          <path d="M80,36 Q88,32 96,36" stroke="#2c1810" stroke-width="2.5" fill="none"/>
-          <path d="M104,36 Q112,32 120,36" stroke="#2c1810" stroke-width="2.5" fill="none"/>
-          <!-- mouth -->
-          <path d="M92,62 Q100,70 108,62" stroke="#c04060" stroke-width="2.5" fill="none"/>
-        </g>
-
-        <!-- hair -->
-        <g class="hair">
-          <ellipse cx="100" cy="28" rx="40" ry="32" fill="var(--hair-w)"/>
-          <path d="M60,35 Q45,80 55,130 Q70,100 75,70 Z" fill="var(--hair-w)"/>
-          <path d="M140,35 Q155,80 145,130 Q130,100 125,70 Z" fill="var(--hair-w)"/>
-          <path d="M70,20 Q100,5 130,20 Q125,45 100,50 Q75,45 70,20" fill="#3d2518"/>
-        </g>
-
-        <defs>
-          <linearGradient id="skinW" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#f8d4c0"/>
-            <stop offset="100%" stop-color="#e8b090"/>
-          </linearGradient>
-          <linearGradient id="lingerie" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#ff6b9d"/>
-            <stop offset="100%" stop-color="#c01840"/>
-          </linearGradient>
-        </defs>
-      </svg>
-
-      <!-- ========== SUB SVG ========== -->
-      <svg id="sub-svg" class="char-svg" viewBox="0 0 160 280" xmlns="http://www.w3.org/2000/svg">
-        <!-- legs -->
-        <g class="joint leg-l" transform="translate(52,165)">
-          <rect x="-10" y="0" width="20" height="85" rx="10" fill="url(#skinM)"/>
-          <ellipse cx="0" cy="88" rx="12" ry="7" fill="#c99870"/>
-        </g>
-        <g class="joint leg-r" transform="translate(108,165)">
-          <rect x="-10" y="0" width="20" height="85" rx="10" fill="url(#skinM)"/>
-          <ellipse cx="0" cy="88" rx="12" ry="7" fill="#c99870"/>
-        </g>
-
-        <!-- hips -->
-        <ellipse cx="80" cy="160" rx="36" ry="20" fill="#1e3a5c"/>
-
-        <!-- torso -->
-        <path d="M55,80 Q80,72 105,80 L110,155 Q80,162 50,155 Z" fill="url(#shirt)"/>
-
-        <!-- arms -->
-        <g class="joint arm-l" transform="translate(48,85)">
-          <rect x="-8" y="0" width="16" height="72" rx="8" fill="url(#skinM)"/>
-          <ellipse cx="0" cy="74" rx="9" ry="6" fill="#c99870"/>
-        </g>
-        <g class="joint arm-r" transform="translate(112,85)">
-          <rect x="-8" y="0" width="16" height="72" rx="8" fill="url(#skinM)"/>
-          <ellipse cx="0" cy="74" rx="9" ry="6" fill="#c99870"/>
-        </g>
-
-        <!-- neck -->
-        <rect x="72" y="62" width="16" height="18" rx="5" fill="var(--skin-m)"/>
-
-        <!-- head -->
-        <g class="head">
-          <ellipse cx="80" cy="42" rx="28" ry="32" fill="var(--skin-m)"/>
-          <!-- eyes -->
-          <ellipse cx="70" cy="40" rx="4.5" ry="5" fill="#fff"/>
-          <ellipse cx="90" cy="40" rx="4.5" ry="5" fill="#fff"/>
-          <circle cx="71" cy="41" r="2.5" fill="#2a1810"/>
-          <circle cx="91" cy="41" r="2.5" fill="#2a1810"/>
-          <!-- brows -->
-          <path d="M64,32 Q70,29 76,32" stroke="#1a1210" stroke-width="2" fill="none"/>
-          <path d="M84,32 Q90,29 96,32" stroke="#1a1210" stroke-width="2" fill="none"/>
-          <!-- mouth -->
-          <path d="M73,55 Q80,60 87,55" stroke="#a07050" stroke-width="2" fill="none"/>
-        </g>
-
-        <!-- hair -->
-        <path d="M52,30 Q80,8 108,30 Q105,50 80,55 Q55,50 52,30" fill="var(--hair-m)"/>
-
-        <defs>
-          <linearGradient id="skinM" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#ecc09a"/>
-            <stop offset="100%" stop-color="#c99870"/>
-          </linearGradient>
-          <linearGradient id="shirt" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#5a9ae8"/>
-            <stop offset="100%" stop-color="#1e3a5c"/>
-          </linearGradient>
-        </defs>
-      </svg>
-    </div>
-
-    <div id="status">Waiting for Mistress to decide your fate...</div>
-
+    <div id="stage"></div>
+    <div id="status">Waiting for Mistress...</div>
     <div id="mistressControls" class="controls hidden">
       <button data-pose="ride">Ride Him</button>
       <button data-pose="spank">Spank Him</button>
       <button data-pose="facesit">Face Sit</button>
       <button data-pose="asslick">Make Him Lick</button>
-      <button data-pose="bondage">Bondage Pose</button>
+      <button data-pose="bondage">Bondage</button>
       <button id="btnIntense">Toggle Intensity</button>
     </div>
-
     <div id="roomInfo"></div>
   </div>
 
-  <p class="note">100% free · PeerJS multiplayer · Detailed original SVG characters · No paid assets</p>
+  <p class="note">100% free · Three.js 3D · PeerJS multiplayer · No paid / copyrighted assets</p>
 
 <script>
-  let role = null;
-  let peer = null;
-  let conn = null;
-  let roomId = null;
-  let currentPose = 'ride';
-  let intense = false;
+/* ========= STATE ========= */
+let role = null, peer = null, conn = null;
+let currentPose = 'ride', intense = false;
+let scene, camera, renderer, mistress, sub, clock;
+let animTime = 0;
 
-  const statusEl = document.getElementById('status');
-  const stage = document.getElementById('stage');
-  const texts = {
-    ride: "She's riding you hard. Your hips stay still. She uses you.",
-    spank: "Her hand is coming down again. Take every slap. Don't flinch.",
-    facesit: "Her full weight on your face. Tongue out. Breathe when she allows it.",
-    asslick: "Face buried. Lick properly. She feels every stroke of your tongue.",
-    bondage: "Arms locked. Legs open. Completely useless until she decides otherwise."
-  };
+const statusEl = document.getElementById('status');
+const texts = {
+  ride: "She's riding you. Hips locked. She decides the pace.",
+  spank: "Her hand swings down. Take every impact.",
+  facesit: "Full weight on your face. Tongue out. Breathe when allowed.",
+  asslick: "Face buried. Lick properly. She feels every stroke.",
+  bondage: "Arms locked behind. Completely useless until she says otherwise."
+};
 
-  function show(el) { el.classList.remove('hidden'); }
-  function hide(el) { el.classList.add('hidden'); }
+function show(el){ el.classList.remove('hidden'); }
+function hide(el){ el.classList.add('hidden'); }
 
-  function setPose(pose, isIntense) {
-    currentPose = pose;
-    intense = !!isIntense;
-    stage.className = 'pose-' + pose + (intense ? ' intense' : '');
-    statusEl.textContent = texts[pose] || '';
-    if (intense) statusEl.textContent += '  ·  HARDER.';
+/* ========= 3D CHARACTER BUILDER ========= */
+function makeMaterial(color, roughness=0.55) {
+  return new THREE.MeshStandardMaterial({ color, roughness, metalness: 0.05 });
+}
+
+function createLimb(len, radius, mat) {
+  const geo = new THREE.CapsuleGeometry(radius, len - radius*2, 6, 8);
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.castShadow = true;
+  return mesh;
+}
+
+function createCharacter(isMistress) {
+  const root = new THREE.Group();
+  const skin = isMistress ? 0xf5c9b0 : 0xe0b08a;
+  const clothes = isMistress ? 0xc01840 : 0x1e3a5c;
+  const hairCol = isMistress ? 0x2c1810 : 0x1a1210;
+  const skinMat = makeMaterial(skin);
+  const clothMat = makeMaterial(clothes, 0.7);
+  const hairMat = makeMaterial(hairCol, 0.8);
+
+  // Hips
+  const hips = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 10), clothMat);
+  hips.scale.set(1.15, 0.7, 0.9);
+  hips.position.y = 0.95;
+  root.add(hips);
+
+  // Torso
+  const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.2, 0.45, 6, 10), clothMat);
+  torso.position.y = 1.35;
+  root.add(torso);
+
+  // Breasts (mistress only)
+  if (isMistress) {
+    const bL = new THREE.Mesh(new THREE.SphereGeometry(0.11, 10, 8), makeMaterial(0xff8fb0, 0.45));
+    bL.position.set(-0.13, 1.42, 0.16);
+    const bR = bL.clone();
+    bR.position.x = 0.13;
+    root.add(bL, bR);
   }
 
-  function broadcast(data) {
-    if (conn && conn.open) conn.send(data);
+  // Head
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.18, 14, 12), skinMat);
+  head.position.y = 1.85;
+  root.add(head);
+
+  // Hair
+  const hair = new THREE.Mesh(new THREE.SphereGeometry(0.2, 12, 10), hairMat);
+  hair.position.y = 1.95;
+  hair.scale.set(1.05, 0.9, 1.05);
+  root.add(hair);
+  if (isMistress) {
+    // longer side hair
+    const sideL = new THREE.Mesh(new THREE.CapsuleGeometry(0.06, 0.45, 4, 6), hairMat);
+    sideL.position.set(-0.22, 1.7, 0);
+    sideL.rotation.z = 0.3;
+    const sideR = sideL.clone();
+    sideR.position.x = 0.22;
+    sideR.rotation.z = -0.3;
+    root.add(sideL, sideR);
   }
 
-  function initPeer(id) {
-    peer = new Peer(id, { debug: 1 });
-    peer.on('open', (id) => {
-      if (role === 'mistress') {
-        document.getElementById('codeText').textContent = id.toUpperCase();
-        show(document.getElementById('roomCodeDisplay'));
-        document.getElementById('roomInfo').textContent = 'Room: ' + id.toUpperCase() + ' · Waiting for sub...';
-      }
-    });
-    peer.on('connection', (c) => {
-      conn = c;
-      setupConn();
-    });
-    peer.on('error', (err) => {
-      console.error(err);
-      statusEl.textContent = 'Connection error: ' + err.type;
-    });
+  // Eyes
+  const eyeMat = makeMaterial(0x222222);
+  const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.03, 6, 6), eyeMat);
+  eyeL.position.set(-0.07, 1.88, 0.15);
+  const eyeR = eyeL.clone();
+  eyeR.position.x = 0.07;
+  root.add(eyeL, eyeR);
+
+  // Arms (hierarchical)
+  function makeArm(side) {
+    const armRoot = new THREE.Group();
+    armRoot.position.set(side * 0.28, 1.55, 0);
+    const upper = createLimb(0.38, 0.055, skinMat);
+    upper.position.y = -0.19;
+    armRoot.add(upper);
+    const lower = createLimb(0.34, 0.05, skinMat);
+    lower.position.y = -0.55;
+    armRoot.add(lower);
+    root.add(armRoot);
+    return armRoot;
+  }
+  const armL = makeArm(-1);
+  const armR = makeArm(1);
+
+  // Legs
+  function makeLeg(side) {
+    const legRoot = new THREE.Group();
+    legRoot.position.set(side * 0.12, 0.95, 0);
+    const upper = createLimb(0.42, 0.07, skinMat);
+    upper.position.y = -0.21;
+    legRoot.add(upper);
+    const lower = createLimb(0.4, 0.06, skinMat);
+    lower.position.y = -0.62;
+    legRoot.add(lower);
+    root.add(legRoot);
+    return legRoot;
+  }
+  const legL = makeLeg(-1);
+  const legR = makeLeg(1);
+
+  root.userData = { armL, armR, legL, legR, head, hips, torso };
+  return root;
+}
+
+/* ========= SCENE SETUP ========= */
+function init3D() {
+  const container = document.getElementById('stage');
+  const w = container.clientWidth;
+  const h = container.clientHeight;
+
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0a0306);
+  scene.fog = new THREE.Fog(0x0a0306, 4, 12);
+
+  camera = new THREE.PerspectiveCamera(40, w / h, 0.1, 50);
+  camera.position.set(0, 1.6, 4.2);
+  camera.lookAt(0, 1.2, 0);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  container.appendChild(renderer.domElement);
+
+  // Lights
+  const amb = new THREE.AmbientLight(0xffaabb, 0.45);
+  scene.add(amb);
+  const key = new THREE.DirectionalLight(0xffe0e8, 1.1);
+  key.position.set(2, 4, 3);
+  key.castShadow = true;
+  scene.add(key);
+  const fill = new THREE.DirectionalLight(0x88aaff, 0.35);
+  fill.position.set(-2, 2, -1);
+  scene.add(fill);
+  const rim = new THREE.PointLight(0xff4d6d, 0.6, 8);
+  rim.position.set(0, 2.5, -2);
+  scene.add(rim);
+
+  // Floor
+  const floor = new THREE.Mesh(
+    new THREE.CircleGeometry(3, 32),
+    new THREE.MeshStandardMaterial({ color: 0x1a0a12, roughness: 0.9 })
+  );
+  floor.rotation.x = -Math.PI / 2;
+  floor.receiveShadow = true;
+  scene.add(floor);
+
+  // Characters
+  mistress = createCharacter(true);
+  mistress.position.set(0.15, 0, 0.1);
+  scene.add(mistress);
+
+  sub = createCharacter(false);
+  sub.position.set(-0.05, 0, -0.15);
+  sub.scale.set(0.95, 0.95, 0.95);
+  scene.add(sub);
+
+  clock = new THREE.Clock();
+  applyPose('ride', false);
+  animate();
+}
+
+/* ========= POSES & ANIMATION ========= */
+function applyPose(pose, isIntense) {
+  currentPose = pose;
+  intense = !!isIntense;
+  statusEl.textContent = texts[pose] + (intense ? '  ·  HARDER.' : '');
+
+  // Reset base rotations
+  const m = mistress.userData;
+  const s = sub.userData;
+
+  // Default neutral-ish
+  m.armL.rotation.set(0, 0, 0.25);
+  m.armR.rotation.set(0, 0, -0.25);
+  m.legL.rotation.set(0, 0, 0.08);
+  m.legR.rotation.set(0, 0, -0.08);
+  m.head.rotation.set(0, 0, 0);
+  s.armL.rotation.set(0, 0, 0.2);
+  s.armR.rotation.set(0, 0, -0.2);
+  s.legL.rotation.set(0, 0, 0.1);
+  s.legR.rotation.set(0, 0, -0.1);
+  s.head.rotation.set(0, 0, 0);
+
+  mistress.position.set(0.15, 0, 0.1);
+  mistress.rotation.set(0, 0, 0);
+  sub.position.set(-0.05, 0, -0.15);
+  sub.rotation.set(0, 0, 0);
+  sub.scale.set(0.95, 0.95, 0.95);
+
+  if (pose === 'ride') {
+    mistress.position.set(0.05, 0.35, 0.05);
+    m.legL.rotation.z = 0.55;
+    m.legR.rotation.z = -0.55;
+    m.armL.rotation.z = 0.4;
+    m.armR.rotation.z = -0.4;
+    sub.position.set(0, 0, 0);
+    s.armL.rotation.z = 0.3;
+    s.armR.rotation.z = -0.3;
+  } else if (pose === 'spank') {
+    mistress.position.set(-0.55, 0.1, 0.2);
+    mistress.rotation.y = 0.4;
+    m.armR.rotation.z = -1.4;
+    m.armR.rotation.x = -0.3;
+    m.legL.rotation.z = 0.25;
+    sub.position.set(0.4, 0, -0.1);
+    sub.rotation.y = -0.5;
+    sub.rotation.z = 0.25;
+    s.armL.rotation.z = -0.8;
+    s.armR.rotation.z = 0.9;
+  } else if (pose === 'facesit') {
+    mistress.position.set(0.05, 0.85, 0.1);
+    m.legL.rotation.z = 0.9;
+    m.legR.rotation.z = -0.9;
+    m.legL.rotation.x = 0.3;
+    m.legR.rotation.x = 0.3;
+    sub.position.set(0, 0, 0);
+    sub.scale.set(0.9, 0.9, 0.9);
+    s.head.rotation.x = -0.4;
+  } else if (pose === 'asslick') {
+    mistress.position.set(-0.7, 0.15, 0.15);
+    mistress.rotation.y = 0.6;
+    mistress.rotation.z = -0.25;
+    m.armL.rotation.z = 0.6;
+    sub.position.set(0.55, 0.25, -0.05);
+    sub.rotation.z = 0.9;
+    sub.rotation.y = -0.4;
+    s.head.rotation.x = -0.5;
+    s.armL.rotation.z = 1.1;
+  } else if (pose === 'bondage') {
+    mistress.position.set(0.2, 0.2, 0.1);
+    m.armL.rotation.z = 0.2;
+    m.armR.rotation.z = -0.2;
+    sub.position.set(-0.1, 0, 0);
+    s.armL.rotation.z = -1.7;
+    s.armR.rotation.z = 1.7;
+    s.armL.rotation.x = 0.4;
+    s.armR.rotation.x = 0.4;
+    s.legL.rotation.z = 0.4;
+    s.legR.rotation.z = -0.4;
+  }
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = clock.getDelta();
+  animTime += dt;
+
+  if (intense && mistress && sub) {
+    const m = mistress.userData;
+    const s = sub.userData;
+    const t = animTime;
+
+    if (currentPose === 'ride') {
+      mistress.position.y = 0.35 + Math.sin(t * 9) * 0.08;
+    } else if (currentPose === 'spank') {
+      m.armR.rotation.z = -1.0 + Math.sin(t * 11) * 0.55;
+    } else if (currentPose === 'facesit') {
+      mistress.position.y = 0.85 + Math.sin(t * 7) * 0.05;
+    } else if (currentPose === 'asslick') {
+      s.head.rotation.x = -0.5 + Math.sin(t * 10) * 0.12;
+      s.head.position.z = Math.sin(t * 10) * 0.02;
+    } else if (currentPose === 'bondage') {
+      sub.rotation.z = Math.sin(t * 4) * 0.06;
+    }
   }
 
-  function setupConn() {
-    conn.on('open', () => {
-      document.getElementById('roomInfo').textContent = 'Connected · Mistress is in control';
-      if (role === 'mistress') {
-        broadcast({ type: 'state', pose: currentPose, intense });
-      }
-      hide(document.getElementById('lobby'));
-      show(document.getElementById('game'));
-      document.getElementById('roleBadge').textContent = role === 'mistress' ? 'MISTRESS' : 'SUB – OBEY';
-      if (role === 'mistress') show(document.getElementById('mistressControls'));
-    });
-    conn.on('data', (data) => {
-      if (data.type === 'state') {
-        setPose(data.pose, data.intense);
-      }
-    });
-    conn.on('close', () => {
-      statusEl.textContent = 'Connection closed.';
-    });
-  }
+  renderer.render(scene, camera);
+}
 
-  document.getElementById('btnMistress').onclick = () => {
-    role = 'mistress';
-    hide(document.getElementById('btnMistress'));
-    hide(document.getElementById('btnSub'));
-    show(document.getElementById('mistressSetup'));
-  };
+/* ========= MULTIPLAYER ========= */
+function broadcast(data) {
+  if (conn && conn.open) conn.send(data);
+}
 
-  document.getElementById('btnSub').onclick = () => {
-    role = 'sub';
-    hide(document.getElementById('btnMistress'));
-    hide(document.getElementById('btnSub'));
-    show(document.getElementById('subSetup'));
-  };
+function setPose(pose, isIntense) {
+  applyPose(pose, isIntense);
+}
 
-  document.getElementById('btnCreate').onclick = () => {
-    const id = Math.random().toString(36).substring(2, 8);
-    roomId = id;
-    initPeer(id);
-  };
-
-  document.getElementById('btnJoin').onclick = () => {
-    const code = document.getElementById('joinCode').value.trim().toLowerCase();
-    if (!code) return;
-    roomId = code;
-    initPeer();
-    peer.on('open', () => {
-      conn = peer.connect(code);
-      setupConn();
-    });
-  };
-
-  document.querySelectorAll('#mistressControls button[data-pose]').forEach(btn => {
-    btn.onclick = () => {
-      const pose = btn.dataset.pose;
-      setPose(pose, intense);
-      broadcast({ type: 'state', pose, intense });
-    };
+function initPeer(id) {
+  peer = new Peer(id, { debug: 1 });
+  peer.on('open', (id) => {
+    if (role === 'mistress') {
+      document.getElementById('codeText').textContent = id.toUpperCase();
+      show(document.getElementById('roomCodeDisplay'));
+      document.getElementById('roomInfo').textContent = 'Room: ' + id.toUpperCase() + ' · Waiting...';
+    }
   });
+  peer.on('connection', (c) => { conn = c; setupConn(); });
+  peer.on('error', (err) => { statusEl.textContent = 'Error: ' + err.type; });
+}
 
-  document.getElementById('btnIntense').onclick = () => {
-    intense = !intense;
-    setPose(currentPose, intense);
-    broadcast({ type: 'state', pose: currentPose, intense });
-  };
-
-  // Demo mode for testing alone
-  window.startDemo = function() {
-    role = 'mistress';
+function setupConn() {
+  conn.on('open', () => {
+    document.getElementById('roomInfo').textContent = 'Connected · Mistress in control';
+    if (role === 'mistress') broadcast({ type: 'state', pose: currentPose, intense });
     hide(document.getElementById('lobby'));
     show(document.getElementById('game'));
-    document.getElementById('roleBadge').textContent = 'DEMO MODE (Mistress)';
-    show(document.getElementById('mistressControls'));
-    setPose('ride', false);
+    document.getElementById('roleBadge').textContent = role === 'mistress' ? 'MISTRESS' : 'SUB – OBEY';
+    if (role === 'mistress') show(document.getElementById('mistressControls'));
+    if (!renderer) init3D();
+  });
+  conn.on('data', (data) => {
+    if (data.type === 'state') setPose(data.pose, data.intense);
+  });
+  conn.on('close', () => { statusEl.textContent = 'Connection closed.'; });
+}
+
+/* ========= UI ========= */
+document.getElementById('btnMistress').onclick = () => {
+  role = 'mistress';
+  hide(document.getElementById('btnMistress'));
+  hide(document.getElementById('btnSub'));
+  show(document.getElementById('mistressSetup'));
+};
+document.getElementById('btnSub').onclick = () => {
+  role = 'sub';
+  hide(document.getElementById('btnMistress'));
+  hide(document.getElementById('btnSub'));
+  show(document.getElementById('subSetup'));
+};
+document.getElementById('btnCreate').onclick = () => {
+  const id = Math.random().toString(36).substring(2, 8);
+  initPeer(id);
+};
+document.getElementById('btnJoin').onclick = () => {
+  const code = document.getElementById('joinCode').value.trim().toLowerCase();
+  if (!code) return;
+  initPeer();
+  peer.on('open', () => {
+    conn = peer.connect(code);
+    setupConn();
+  });
+};
+
+document.querySelectorAll('#mistressControls button[data-pose]').forEach(btn => {
+  btn.onclick = () => {
+    const pose = btn.dataset.pose;
+    setPose(pose, intense);
+    broadcast({ type: 'state', pose, intense });
   };
+});
+document.getElementById('btnIntense').onclick = () => {
+  intense = !intense;
+  setPose(currentPose, intense);
+  broadcast({ type: 'state', pose: currentPose, intense });
+};
+
+// Solo demo
+window.startDemo = function() {
+  role = 'mistress';
+  hide(document.getElementById('lobby'));
+  show(document.getElementById('game'));
+  document.getElementById('roleBadge').textContent = 'DEMO (Mistress)';
+  show(document.getElementById('mistressControls'));
+  init3D();
+  setPose('ride', false);
+};
+
+window.addEventListener('resize', () => {
+  if (!renderer) return;
+  const c = document.getElementById('stage');
+  camera.aspect = c.clientWidth / c.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(c.clientWidth, c.clientHeight);
+});
 </script>
 </body>
 </html>
