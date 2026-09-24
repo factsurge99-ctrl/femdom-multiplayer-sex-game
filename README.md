@@ -4,25 +4,32 @@
 
 Browser-based animated femdom game where your Mistress controls everything and you obey.
 
-## Features
-- Real-time multiplayer (Mistress + Sub) using free PeerJS
-- Animated positions & actions: spanking, face-sitting, ass-licking, bondage poses, intensity control
-- Dirty status text that updates live
-- Mistress has full control buttons; Sub just receives
-- Works offline for single-player demo mode
-- Pure HTML/CSS/JS – host on GitHub Pages for free forever
+## Current Version – Option 1 (Detailed Original SVG)
+- Completely rewritten characters as detailed original SVG figures (proper proportions, hair, faces, independent limbs)
+- Smooth multi-part animations for Ride, Spank, Face-Sit, Ass-Lick, Bondage
+- Intensity toggle with continuous motion
+- Real-time multiplayer via free PeerJS (Mistress controls, Sub receives)
+- Dirty live status text
+- Works on desktop & mobile browsers
+- Pure HTML/CSS/JS – no paid assets, no external copyrighted models
 
 ## How to play
-1. Open `index.html` (or the GitHub Pages link once enabled)
+1. Open `index.html` (or enable GitHub Pages)
 2. One person chooses **Mistress**, the other **Sub**
-3. Mistress creates a room → gets a code
+3. Mistress creates a room → gets a short code
 4. Sub enters the code and joins
-5. Mistress clicks actions. Sub watches the animations and obeys.
+5. Mistress clicks actions. Sub watches and obeys.
 
-## Enable GitHub Pages
-Settings → Pages → Source: Deploy from branch `main` / root
+**Solo test:** Open the browser console and type `startDemo()` to jump straight into Mistress controls.
 
-Then the live link will be:
+## Enable GitHub Pages (free permanent link)
+Repo → Settings → Pages → Source = Deploy from branch `main` / root  
+Live link becomes:  
 `https://factsurge99-ctrl.github.io/femdom-multiplayer-sex-game/`
 
-Never pay for this shit. Steal it, fork it, break it, own it.
+## Next options (say the word)
+- Option 2: Three.js + free CC0 3D characters
+- Option 3: Free 2D sprite sheets
+- More poses, dirtier text, sound effects, clothing states, etc.
+
+Never pay for this. Fork it, improve it, own it.
